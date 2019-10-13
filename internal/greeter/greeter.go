@@ -9,15 +9,15 @@ import (
 )
 
 const (
-	messagesPort = "8081"
+	greeterPort = "8081"
 )
 
-type Messages struct {
+type Greeter struct {
 	Client greeter_pb.HelloServiceClient
 }
 
-func NewMessages(c greeter_pb.HelloServiceClient) *Messages {
-	return &Messages{Client: c}
+func NewGreeter(c greeter_pb.HelloServiceClient) *Greeter {
+	return &Greeter{Client: c}
 }
 
 type HelloMessageRequest struct {
@@ -36,7 +36,7 @@ type HelloMessageResponse struct {
 	Message string `json: "message"`
 }
 
-func (m Messages) HelloHandler(c *gin.Context) {
+func (g Greeter) HelloHandler(c *gin.Context) {
 	var (
 		req HelloMessageRequest
 		res HelloMessageResponse
@@ -54,7 +54,7 @@ func (m Messages) HelloHandler(c *gin.Context) {
 		return
 	}
 
-	r, err := m.Client.SayHello(c, &greeter_pb.HelloRequest{Name: req.Name})
+	r, err := g.Client.SayHello(c, &greeter_pb.HelloRequest{Name: req.Name})
 	if err != nil {
 		c.JSON(http.StatusBadRequest, err)
 		return

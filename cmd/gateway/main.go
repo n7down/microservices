@@ -71,7 +71,6 @@ func AuthLogin(in LoginRequest) (*LoginResponse, error) {
 var loginResponse *LoginResponse
 
 func main() {
-	gin.SetMode(gin.ReleaseMode)
 	router := gin.New()
 	authMiddleware, err := jwt.New(&jwt.GinJWTMiddleware{
 		Realm:            "production",
@@ -86,15 +85,15 @@ func main() {
 				return "", jwt.ErrMissingLoginValues
 			}
 
-			authLoginResponse := &LoginResponse{}
-			authLoginResponse, err := AuthLogin(in)
-			loginResponse = authLoginResponse
+			response := &LoginResponse{}
+			response, err := AuthLogin(in)
+			loginResponse = response
 
 			if err != nil {
 				return "", err
 			}
 
-			return authLoginResponse, nil
+			return response, nil
 		},
 		Authorizator: func(data interface{}, c *gin.Context) bool {
 			return true
