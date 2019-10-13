@@ -132,7 +132,7 @@ func main() {
 	v1 := router.Group("/api/v1")
 
 	auth := v1.Group("/auth")
-	auth.GET("/refresh_token", authMiddleware.RefreshHandler)
+	auth.GET("/refresh", authMiddleware.RefreshHandler)
 	auth.POST("/login", authMiddleware.LoginHandler)
 
 	conn, err := grpc.Dial("127.0.0.1:8081", grpc.WithInsecure())
