@@ -6,7 +6,7 @@ import (
 	"log"
 	"net"
 
-	"github.com/n7down/microservices/internal/messages/pb"
+	"github.com/n7down/microservices/internal/greeter/pb"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 )
@@ -15,10 +15,10 @@ var (
 	port = "8081"
 )
 
-type messageServer struct{}
+type greeterServer struct{}
 
-func (m *messageServer) SayHello(ctx context.Context, req *messages.HelloRequest) (*messages.HelloResponse, error) {
-	return &messages.HelloResponse{Message: "Hello " + req.Name}, nil
+func (g *greeterServer) SayHello(ctx context.Context, req *greeter_pb.HelloRequest) (*greeter_pb.HelloResponse, error) {
+	return &greeter_pb.HelloResponse{Message: "Hello " + req.Name}, nil
 }
 
 func main() {
@@ -29,6 +29,6 @@ func main() {
 	}
 	fmt.Printf("Listening on port: %s\n", port)
 	grpcServer := grpc.NewServer()
-	messages.RegisterHelloServiceServer(grpcServer, &messageServer{})
+	greeter_pb.RegisterHelloServiceServer(grpcServer, &greeterServer{})
 	grpcServer.Serve(lis)
 }

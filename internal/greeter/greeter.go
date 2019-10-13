@@ -5,7 +5,7 @@ import (
 	"net/url"
 
 	"github.com/gin-gonic/gin"
-	"github.com/n7down/microservices/internal/messages/pb"
+	"github.com/n7down/microservices/internal/greeter/pb"
 )
 
 const (
@@ -13,10 +13,10 @@ const (
 )
 
 type Messages struct {
-	Client messages.HelloServiceClient
+	Client greeter_pb.HelloServiceClient
 }
 
-func NewMessages(c messages.HelloServiceClient) *Messages {
+func NewMessages(c greeter_pb.HelloServiceClient) *Messages {
 	return &Messages{Client: c}
 }
 
@@ -54,8 +54,7 @@ func (m Messages) HelloHandler(c *gin.Context) {
 		return
 	}
 
-	// FIXME: change package messages for HelloRequest to messages.pb
-	r, err := m.Client.SayHello(c, &messages.HelloRequest{Name: req.Name})
+	r, err := m.Client.SayHello(c, &greeter_pb.HelloRequest{Name: req.Name})
 	if err != nil {
 		c.JSON(http.StatusBadRequest, err)
 		return

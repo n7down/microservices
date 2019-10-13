@@ -11,8 +11,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
 
-	"github.com/n7down/microservices/internal/messages"
-	messagesPB "github.com/n7down/microservices/internal/messages/pb"
+	"github.com/n7down/microservices/internal/greeter"
+	"github.com/n7down/microservices/internal/greeter/pb"
 
 	"github.com/n7down/microservices/internal/users"
 )
@@ -136,7 +136,7 @@ func main() {
 	}
 	defer conn.Close()
 
-	helloClient := messagesPB.NewHelloServiceClient(conn)
+	helloClient := greeter_pb.NewHelloServiceClient(conn)
 
 	messagesGroup := v1.Group("/messages")
 	//internal.Use(authMiddleware.MiddlewareFunc())

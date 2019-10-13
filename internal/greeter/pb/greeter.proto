@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package messages;
+package greeter_pb;
 
 message HelloRequest {
 	string name = 1;
