@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
-	"github.com/appleboy/gin-jwt/v2"
+	jwt "github.com/appleboy/gin-jwt"
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
 
@@ -16,106 +17,104 @@ import (
 	"github.com/n7down/microservices/internal/users"
 )
 
-type login struct {
-	Username string `form:"username" json:"username" binding:"required"`
-	Password string `form:"password" json:"password" binding:"required"`
-}
-
 var (
-	identityKey  = "id"
-	gatewayPort  = "8080"
-	messagesPort = "8081"
+	gatewayPort = "8080"
 )
 
-func helloHandler(c *gin.Context) {
-	claims := jwt.ExtractClaims(c)
-	user, _ := c.Get(identityKey)
-	c.JSON(200, gin.H{
-		"userID":   claims[identityKey],
-		"userName": user.(*User).UserName,
-		"text":     "Hello World.",
-	})
+// LoginRequest represents a login json request.
+type LoginRequest struct {
+	Username string `json:"username" binding:"required"`
+	Password string `json:"password" binding:"required"`
 }
 
-// User demo
-type User struct {
-	UserName  string
-	FirstName string
-	LastName  string
+// LoginResponse defines a login response
+type LoginResponse struct {
+	FirstName string `json:"firstname"`
+	LastName  string `json:"lastname"`
+	Username  string `json:"username"`
+	Token     string `json:"token"`
+	Expires   string `json:"expires"`
 }
+
+func AuthLogin(in LoginRequest) (*LoginResponse, error) {
+	//var user users.User
+
+	// FIXME: get the user
+	//err := user.GetUserByID(in.Username)
+	//if err != nil {
+	//return &auth.LoginResponse{}, err
+	//}
+
+	//if isValidSecret, _ := utils.CheckUserSecret(user.HashSecret, in.Password); isValidSecret {
+	//return &auth.LoginResponse{
+	//FirstName:       user.FirstName,
+	//LastName:        user.LastName,
+	//UserID:          user.UserID,
+	//Secret:          user.Secret,
+	//IDType:          user.IDType,
+	//SecretValidFrom: user.SecretValidFrom,
+	//SecretValidTo:   user.SecretValidTo,
+	//}, nil
+	//}
+
+	if in.Username == "admin" && in.Password == "admin" {
+		return &LoginResponse{
+			FirstName: "Leslie",
+			LastName:  "Knope",
+			Username:  "leslie2020",
+		}, nil
+	}
+
+	return &LoginResponse{}, jwt.ErrFailedAuthentication
+}
+
+var loginResponse *LoginResponse
 
 func main() {
+	gin.SetMode(gin.ReleaseMode)
 	router := gin.New()
-	router.Use(gin.Logger())
-	router.Use(gin.Recovery())
-	// the jwt middleware
 	authMiddleware, err := jwt.New(&jwt.GinJWTMiddleware{
-		Realm:       "test zone",
-		Key:         []byte("secret key"),
-		Timeout:     time.Hour,
-		MaxRefresh:  time.Hour,
-		IdentityKey: identityKey,
-		PayloadFunc: func(data interface{}) jwt.MapClaims {
-			if v, ok := data.(*User); ok {
-				return jwt.MapClaims{
-					identityKey: v.UserName,
-				}
-			}
-			return jwt.MapClaims{}
-		},
-		IdentityHandler: func(c *gin.Context) interface{} {
-			claims := jwt.ExtractClaims(c)
-			return &User{
-				UserName: claims[identityKey].(string),
-			}
-		},
+		Realm:            "production",
+		Key:              []byte(os.Getenv("AUTH_KEY")),
+		Timeout:          time.Duration(24) * time.Hour,
+		MaxRefresh:       time.Duration(24) * time.Hour,
+		IdentityKey:      "id",
+		SigningAlgorithm: "HS256",
 		Authenticator: func(c *gin.Context) (interface{}, error) {
-			var loginVals login
-			if err := c.ShouldBind(&loginVals); err != nil {
+			var in LoginRequest
+			if err := c.ShouldBind(&in); err != nil {
 				return "", jwt.ErrMissingLoginValues
 			}
-			userID := loginVals.Username
-			password := loginVals.Password
 
-			if (userID == "admin" && password == "admin") || (userID == "test" && password == "test") {
-				return &User{
-					UserName:  userID,
-					LastName:  "Bo-Yi",
-					FirstName: "Wu",
-				}, nil
+			authLoginResponse := &LoginResponse{}
+			authLoginResponse, err := AuthLogin(in)
+			loginResponse = authLoginResponse
+
+			if err != nil {
+				return "", err
 			}
 
-			return nil, jwt.ErrFailedAuthentication
+			return authLoginResponse, nil
 		},
 		Authorizator: func(data interface{}, c *gin.Context) bool {
-			if v, ok := data.(*User); ok && v.UserName == "admin" {
-				return true
-			}
-
-			return false
+			return true
 		},
+
 		Unauthorized: func(c *gin.Context, code int, message string) {
 			c.JSON(code, gin.H{
 				"code":    code,
 				"message": message,
 			})
 		},
-		// TokenLookup is a string in the form of "<source>:<name>" that is used
-		// to extract token from the request.
-		// Optional. Default value "header:Authorization".
-		// Possible values:
-		// - "header:<name>"
-		// - "query:<name>"
-		// - "cookie:<name>"
-		// - "param:<name>"
-		TokenLookup: "header: Authorization, query: token, cookie: jwt",
-		// TokenLookup: "query:token",
-		// TokenLookup: "cookie:token",
 
-		// TokenHeadName is a string in the header. Default value is "Bearer"
+		LoginResponse: func(c *gin.Context, statusCode int, token string, tokenExpires time.Time) {
+			loginResponse.Token = token
+			loginResponse.Expires = tokenExpires.String()
+			c.JSON(http.StatusOK, loginResponse)
+		},
+
 		TokenHeadName: "Bearer",
 
-		// TimeFunc provides the current time. You can override it to use another time value. This is useful for testing or if your server uses a different time zone than your tokens.
 		TimeFunc: time.Now,
 	})
 
@@ -123,18 +122,13 @@ func main() {
 		log.Fatal("JWT Error:" + err.Error())
 	}
 
-	router.NoRoute(authMiddleware.MiddlewareFunc(), func(c *gin.Context) {
-		claims := jwt.ExtractClaims(c)
-		log.Printf("NoRoute claims: %#v\n", claims)
-		c.JSON(404, gin.H{"code": "PAGE_NOT_FOUND", "message": "Page not found"})
-	})
-
 	v1 := router.Group("/api/v1")
 
 	auth := v1.Group("/auth")
 	auth.GET("/refresh", authMiddleware.RefreshHandler)
 	auth.POST("/login", authMiddleware.LoginHandler)
 
+	// FIXME: move to somewhere else
 	conn, err := grpc.Dial("127.0.0.1:8081", grpc.WithInsecure())
 	if err != nil {
 		log.Fatal(err)

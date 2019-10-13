@@ -15,9 +15,9 @@ var (
 	port = "8081"
 )
 
-type testServer struct{}
+type messageServer struct{}
 
-func (t *testServer) SayHello(ctx context.Context, req *messages.HelloRequest) (*messages.HelloResponse, error) {
+func (m *messageServer) SayHello(ctx context.Context, req *messages.HelloRequest) (*messages.HelloResponse, error) {
 	return &messages.HelloResponse{Message: "Hello " + req.Name}, nil
 }
 
@@ -29,6 +29,6 @@ func main() {
 	}
 	fmt.Printf("Listening on port: %s\n", port)
 	grpcServer := grpc.NewServer()
-	messages.RegisterHelloServiceServer(grpcServer, &testServer{})
+	messages.RegisterHelloServiceServer(grpcServer, &messageServer{})
 	grpcServer.Serve(lis)
 }

@@ -54,6 +54,7 @@ func (m Messages) HelloHandler(c *gin.Context) {
 		return
 	}
 
+	// FIXME: change package messages for HelloRequest to messages.pb
 	r, err := m.Client.SayHello(c, &messages.HelloRequest{Name: req.Name})
 	if err != nil {
 		c.JSON(http.StatusBadRequest, err)
