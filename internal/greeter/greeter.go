@@ -1,45 +1,26 @@
-package messages
+package greeter
 
 import (
 	"net/http"
-	"net/url"
 
 	"github.com/gin-gonic/gin"
 	"github.com/n7down/microservices/internal/greeter/pb"
-)
-
-const (
-	greeterPort = "8081"
+	"github.com/n7down/microservices/internal/greeter/request"
+	"github.com/n7down/microservices/internal/greeter/response"
 )
 
 type Greeter struct {
-	Client greeter_pb.HelloServiceClient
+	Client greeter_pb.GreeterServiceClient
 }
 
-func NewGreeter(c greeter_pb.HelloServiceClient) *Greeter {
+func NewGreeter(c greeter_pb.GreeterServiceClient) *Greeter {
 	return &Greeter{Client: c}
-}
-
-type HelloMessageRequest struct {
-	Name string `json: "name" binding:"required"`
-}
-
-func (r *HelloMessageRequest) Validate() url.Values {
-	errs := url.Values{}
-	if r.Name == "" {
-		errs.Add("name", "The name field is required!")
-	}
-	return errs
-}
-
-type HelloMessageResponse struct {
-	Message string `json: "message"`
 }
 
 func (g Greeter) HelloHandler(c *gin.Context) {
 	var (
-		req HelloMessageRequest
-		res HelloMessageResponse
+		req request.HelloRequest
+		res response.HelloResponse
 	)
 
 	if err := c.BindJSON(&req); err != nil {
@@ -60,7 +41,7 @@ func (g Greeter) HelloHandler(c *gin.Context) {
 		return
 	}
 
-	res = HelloMessageResponse{
+	res = response.HelloResponse{
 		Message: r.Message,
 	}
 

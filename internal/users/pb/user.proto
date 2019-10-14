@@ -1,0 +1,71 @@
+syntax = "proto3";
+
+package user_pb;
+
+message UserLoginRequest {
+	string Username = 1
+}
+
+message UserLoginResponse {
+	string ID = 1
+	string Password = 2
+}
+
+message UserCreateRequest {
+	string Username = 1
+	string Password = 2
+	string Firstname = 3
+	string Lastname = 4
+}
+
+message UserCreateResponse {
+	string ID = 1
+}
+
+message UserUpdateRequest {
+	string ID = 1 
+	string Username = 2
+	string Firstname = 3
+	string Lastname = 4
+}
+
+message UserUpdateResponse {
+	string ID = 1
+}
+
+// FIXME:
+message UserListRequest {
+}
+
+// FIXME:
+message UserListResponse {
+}
+
+message UserByIDRequest {
+	string ID = 1
+}
+
+message UserByIDResponse {
+	string ID = 1
+	string Username = 2
+	string Firstname = 3
+	string Lastname = 4
+}
+
+message UserDeleteRequest {
+	string ID = 1
+}
+
+message UserDeleteResponse {
+	string ID = 1
+}
+
+service UserService {
+	rpc UserLogin (UserLoginRequest) returns (UserLoginResponse) {}
+	rpc UserCreate (UserCreateRequest) returns (UserCreateResponse) {}
+	rpc UserUpdate (UserUpdateRequest) returns (UserUpdateResponse) {}
+	rpc UserList (UserListRequest) returns (UserListResponse) {}
+	rpc UserByID (UserByIDRequest) returns (UserByIDResponse) {}
+	rpc UserDelete (UserDeleteRequest) returns (UserDeleteResponse) {}
+}
+
