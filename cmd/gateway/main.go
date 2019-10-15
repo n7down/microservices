@@ -18,7 +18,7 @@ func main() {
 	router := gin.New()
 	log.SetReportCaller(true)
 
-	greeterServer, err := greeter.NewGreeterServer(os.Getenv("GREETER_HOST_URL"))
+	greeterServer, err := greeter.NewGreeterServer(os.Getenv("GREETER_HOST"))
 	if err != nil {
 		log.Fatal(err)
 		return

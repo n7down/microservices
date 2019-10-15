@@ -1,15 +1,19 @@
 package greeter
 
 import (
-	"context"
+	"crypto/tls"
 	"net/http"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/n7down/microservices/internal/greeter/pb"
 	"github.com/n7down/microservices/internal/greeter/request"
 	"github.com/n7down/microservices/internal/greeter/response"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
+)
+
+const (
+	cert = "cert.pem"
 )
 
 type GreeterServer struct {
@@ -17,7 +21,18 @@ type GreeterServer struct {
 }
 
 func NewGreeterServer(serverEnv string) (*GreeterServer, error) {
-	greeterConn, err := grpc.Dial(serverEnv, grpc.WithInsecure())
+	config := &tls.Config{
+		InsecureSkipVerify: true,
+	}
+
+	// Create the client TLS credentials
+	//creds, err := credentials.NewClientTLSFromFile(cert, "")
+	//if err != nil {
+	//return &GreeterServer{}, errors.New(fmt.Sprintf("could not load tls cert: %s", err))
+	//}
+
+	//greeterConn, err := grpc.Dial(serverEnv, grpc.WithTransportCredentials(creds))
+	greeterConn, err := grpc.Dial(serverEnv, grpc.WithTransportCredentials(credentials.NewTLS(config)))
 	if err != nil {
 		return nil, err
 	}
@@ -28,8 +43,10 @@ func NewGreeterServer(serverEnv string) (*GreeterServer, error) {
 }
 
 func (s *GreeterServer) HelloHandler(c *gin.Context) {
-	clientCtx, cancel := context.WithTimeout(c, time.Second)
-	defer cancel()
+
+	// FIXME: need to read up on this - https://blog.golang.org/context
+	//clientCtx, cancel := context.WithTimeout(c, time.Second)
+	//defer cancel()
 
 	var (
 		req request.HelloRequest
@@ -48,7 +65,7 @@ func (s *GreeterServer) HelloHandler(c *gin.Context) {
 		return
 	}
 
-	r, err := s.greeterClient.SayHello(clientCtx, &greeter_pb.HelloRequest{Name: req.Name})
+	r, err := s.greeterClient.SayHello(c, &greeter_pb.HelloRequest{Name: req.Name})
 	if err != nil {
 		c.JSON(http.StatusBadRequest, err)
 		return
