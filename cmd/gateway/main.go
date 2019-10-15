@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/n7down/microservices/internal/gateway"
 	"github.com/n7down/microservices/internal/greeter"
+	"github.com/n7down/microservices/internal/users"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -24,8 +25,15 @@ func main() {
 		return
 	}
 
+	usersServer, err := users.NewUsersServer(os.Getenv("USERS_HOST"))
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+
 	gateway := gateway.NewGateway(
 		greeterServer,
+		usersServer,
 	)
 
 	authMiddleware, err := gateway.InitAuthRoutes(router)

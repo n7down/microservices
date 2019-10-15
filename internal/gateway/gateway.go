@@ -12,17 +12,18 @@ import (
 	"github.com/n7down/microservices/internal/gateway/response"
 
 	"github.com/n7down/microservices/internal/greeter"
-
 	"github.com/n7down/microservices/internal/users"
 )
 
 type Gateway struct {
 	greeterServer *greeter.GreeterServer
+	usersServer   *users.UsersServer
 }
 
-func NewGateway(g *greeter.GreeterServer) *Gateway {
+func NewGateway(g *greeter.GreeterServer, u *users.UsersServer) *Gateway {
 	return &Gateway{
 		greeterServer: g,
+		usersServer:   u,
 	}
 }
 
@@ -120,16 +121,15 @@ func (g Gateway) InitRoutes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware)
 		greeterGroup.GET("/hello", g.greeterServer.HelloHandler)
 	}
 
-	u := users.NewUsers()
-	v1.POST("/users/create", u.CreateHandler)
+	v1.POST("/users/create", g.usersServer.CreateHandler)
 
 	usersGroup := v1.Group("/users")
 	usersGroup.Use(authMiddleware.MiddlewareFunc())
 	{
-		usersGroup.GET("/list", u.ListHandler)
-		usersGroup.GET("/byid/:id", u.ByIdHandler)
-		usersGroup.PUT("/update/:id", u.UpdateHandler)
-		usersGroup.DELETE("/delete/:id", u.DeleteHandler)
+		usersGroup.GET("/list", g.usersServer.ListHandler)
+		usersGroup.GET("/byid/:id", g.usersServer.ByIdHandler)
+		usersGroup.GET("/update/:id", g.usersServer.UpdateHandler)
+		usersGroup.GET("/delete/:id", g.usersServer.DeleteHandler)
 	}
 
 	products := v1.Group("/products")

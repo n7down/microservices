@@ -25,13 +25,6 @@ func NewGreeterServer(serverEnv string) (*GreeterServer, error) {
 		InsecureSkipVerify: true,
 	}
 
-	// Create the client TLS credentials
-	//creds, err := credentials.NewClientTLSFromFile(cert, "")
-	//if err != nil {
-	//return &GreeterServer{}, errors.New(fmt.Sprintf("could not load tls cert: %s", err))
-	//}
-
-	//greeterConn, err := grpc.Dial(serverEnv, grpc.WithTransportCredentials(creds))
 	greeterConn, err := grpc.Dial(serverEnv, grpc.WithTransportCredentials(credentials.NewTLS(config)))
 	if err != nil {
 		return nil, err
