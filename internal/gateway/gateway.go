@@ -12,18 +12,17 @@ import (
 	"github.com/n7down/microservices/internal/gateway/response"
 
 	"github.com/n7down/microservices/internal/greeter"
-	"github.com/n7down/microservices/internal/greeter/pb"
 
 	"github.com/n7down/microservices/internal/users"
 )
 
 type Gateway struct {
-	greeterServiceClient greeter_pb.GreeterServiceClient
+	greeterServer *greeter.GreeterServer
 }
 
-func NewGateway(greeterServiceClient greeter_pb.GreeterServiceClient) *Gateway {
+func NewGateway(g *greeter.GreeterServer) *Gateway {
 	return &Gateway{
-		greeterServiceClient: greeterServiceClient,
+		greeterServer: g,
 	}
 }
 
@@ -48,11 +47,11 @@ func (g Gateway) authLogin(in request.LoginRequest) (*response.LoginResponse, er
 	//}, nil
 	//}
 
-	if in.Username == "leslie2020" && in.Password == "password" {
+	if in.Username == "admin" && in.Password == "password" {
 		return &response.LoginResponse{
 			FirstName: "Leslie",
 			LastName:  "Knope",
-			Username:  "leslie2020",
+			Username:  "admin",
 		}, nil
 	}
 
@@ -62,7 +61,7 @@ func (g Gateway) authLogin(in request.LoginRequest) (*response.LoginResponse, er
 func (g Gateway) InitAuthRoutes(r *gin.Engine) (*jwt.GinJWTMiddleware, error) {
 	var loginResponse *response.LoginResponse
 
-	athMiddleware, err := jwt.New(&jwt.GinJWTMiddleware{
+	authMiddleware, err := jwt.New(&jwt.GinJWTMiddleware{
 		Realm:            "production",
 		Key:              []byte(os.Getenv("AUTH_KEY")),
 		Timeout:          time.Duration(24) * time.Hour,
@@ -118,8 +117,7 @@ func (g Gateway) InitRoutes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware)
 
 	greeterGroup := v1.Group("/greeter")
 	{
-		g := greeter.NewGreeter(g.greeterServiceClient)
-		greeterGroup.GET("/hello", g.HelloHandler)
+		greeterGroup.GET("/hello", g.greeterServer.HelloHandler)
 	}
 
 	u := users.NewUsers()

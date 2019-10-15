@@ -1,23 +1,36 @@
 package greeter
 
 import (
+	"context"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/n7down/microservices/internal/greeter/pb"
 	"github.com/n7down/microservices/internal/greeter/request"
 	"github.com/n7down/microservices/internal/greeter/response"
+	"google.golang.org/grpc"
 )
 
-type Greeter struct {
-	Client greeter_pb.GreeterServiceClient
+type GreeterServer struct {
+	greeterClient greeter_pb.GreeterServiceClient
 }
 
-func NewGreeter(c greeter_pb.GreeterServiceClient) *Greeter {
-	return &Greeter{Client: c}
+func NewGreeterServer(serverEnv string) (*GreeterServer, error) {
+	greeterConn, err := grpc.Dial(serverEnv, grpc.WithInsecure())
+	if err != nil {
+		return nil, err
+	}
+	server := &GreeterServer{
+		greeterClient: greeter_pb.NewGreeterServiceClient(greeterConn),
+	}
+	return server, nil
 }
 
-func (g Greeter) HelloHandler(c *gin.Context) {
+func (s *GreeterServer) HelloHandler(c *gin.Context) {
+	clientCtx, cancel := context.WithTimeout(c, time.Second)
+	defer cancel()
+
 	var (
 		req request.HelloRequest
 		res response.HelloResponse
@@ -35,7 +48,7 @@ func (g Greeter) HelloHandler(c *gin.Context) {
 		return
 	}
 
-	r, err := g.Client.SayHello(c, &greeter_pb.HelloRequest{Name: req.Name})
+	r, err := s.greeterClient.SayHello(clientCtx, &greeter_pb.HelloRequest{Name: req.Name})
 	if err != nil {
 		c.JSON(http.StatusBadRequest, err)
 		return

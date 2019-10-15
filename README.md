@@ -4,10 +4,10 @@ Exercise - make a couple of services with their accompanying database and have t
 ## Todo
 - [ ] Make a users service
 - [ ] Make a products service
-- [ ] Create a gateway - use JWT for auth
+- [x] Create a gateway - use JWT for auth
 - [ ] Create a basket service and uses both the users and products service
 - [ ] Use mosquitto for async calls
-- [ ] Use grpc for sync calls
+- [x] Use grpc for sync calls
 - [ ] Use UUIDs
 - [ ] Use IsActive = false when deleting
 - [x] Use go modules
@@ -16,3 +16,4 @@ Exercise - make a couple of services with their accompanying database and have t
 - [ ] Build out activity for a user - can use acync calls through mosquitto and sync calls to get activity
 - [ ] [swagger](https://github.com/go-swagger/go-swagger)
 - [ ] Add authication to grpc
+- [ ] Set the jwt claims

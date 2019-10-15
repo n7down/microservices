@@ -2,14 +2,12 @@ package main
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/gin-gonic/gin"
-	log "github.com/sirupsen/logrus"
-	"google.golang.org/grpc"
-
 	"github.com/n7down/microservices/internal/gateway"
-
-	"github.com/n7down/microservices/internal/greeter/pb"
+	"github.com/n7down/microservices/internal/greeter"
+	log "github.com/sirupsen/logrus"
 )
 
 var (
@@ -20,17 +18,14 @@ func main() {
 	router := gin.New()
 	log.SetReportCaller(true)
 
-	// greeter
-	greeterConn, err := grpc.Dial("127.0.0.1:8081", grpc.WithInsecure())
+	greeterServer, err := greeter.NewGreeterServer(os.Getenv("GREETER_HOST_URL"))
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
-	defer greeterConn.Close()
-	greeterClient := greeter_pb.NewGreeterServiceClient(greeterConn)
 
 	gateway := gateway.NewGateway(
-		greeterClient,
+		greeterServer,
 	)
 
 	authMiddleware, err := gateway.InitAuthRoutes(router)
