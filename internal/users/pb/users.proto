@@ -2,11 +2,11 @@ syntax = "proto3";
 
 package users_pb;
 
-message UsersLoginRequest {
+message UsersPasswordRequest {
 	string Username = 1;
 }
 
-message UsersLoginResponse {
+message UsersPasswordResponse {
 	string ID = 1;
 	string Password = 2;
 }
@@ -39,6 +39,14 @@ message UsersListRequest {
 
 // FIXME:
 message UsersListResponse {
+	repeated User
+}
+
+message User {
+	string ID = 1;
+	string Username = 2;
+	string Firstname = 3;
+	string Lastname = 4;
 }
 
 message UsersByIDRequest {
@@ -61,7 +69,7 @@ message UsersDeleteResponse {
 }
 
 service UsersService {
-	rpc UsersLogin (UsersLoginRequest) returns (UsersLoginResponse) {}
+	rpc UsersGetPassword (UsersPasswordRequest) returns (UsersPasswordResponse) {}
 	rpc UsersCreate (UsersCreateRequest) returns (UsersCreateResponse) {}
 	rpc UsersUpdate (UsersUpdateRequest) returns (UsersUpdateResponse) {}
 	rpc UsersList (UsersListRequest) returns (UsersListResponse) {}

@@ -36,10 +36,10 @@ func NewUsersServer(serverEnv string) (*UsersServer, error) {
 }
 
 // TODO: validation step for each handler
-func (s *UsersServer) Login(c *gin.Context) {
+func (s *UsersServer) CheckPassword(c *gin.Context) {
 	var (
-		req request.LoginRequest
-		res response.LoginResponse
+		req request.CheckPasswordRequest
+		res response.CheckPasswordResponse
 	)
 
 	if err := c.BindJSON(&req); err != nil {
@@ -60,7 +60,7 @@ func (s *UsersServer) Login(c *gin.Context) {
 	//return
 	//}
 
-	res = response.LoginResponse{
+	res = response.CheckPasswordResponse{
 		//Message: r.Message,
 	}
 
@@ -74,6 +74,40 @@ func (s *UsersServer) ByIdHandler(c *gin.Context) {
 }
 
 func (s *UsersServer) ListHandler(c *gin.Context) {
+	var (
+		req request.ListRequest
+		res response.ListResponse
+	)
+
+	if err := c.BindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+
+	// validate input data
+	if validationErrors := req.Validate(); len(validationErrors) > 0 {
+		err := map[string]interface{}{"validationError": validationErrors}
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+
+	//r, err := s.greeterClient.SayHello(c, &greeter_pb.HelloRequest{Name: req.Name})
+	//if err != nil {
+	//c.JSON(http.StatusBadRequest, err)
+	//return
+	//}
+
+	// FIXME: return no content
+	//if len(r) > 0 {
+	//c.JSON(http.StatusNoContent, res)
+	//return
+	//}
+
+	res = response.ListResponse{
+		//Message: r.Message,
+	}
+
+	c.JSON(http.StatusOK, res)
 }
 
 func (s *UsersServer) UpdateHandler(c *gin.Context) {
