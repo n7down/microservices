@@ -4,9 +4,9 @@ import (
 	"net/url"
 )
 
-type LoginRequest struct{}
+type CheckPasswordRequest struct{}
 
-func (r *LoginRequest) Validate() url.Values {
+func (r *CheckPasswordRequest) Validate() url.Values {
 	errs := url.Values{}
 	//if r.Name == "" {
 	//errs.Add("name", "The name field is required!")
