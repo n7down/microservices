@@ -19,3 +19,4 @@ Exercise - make a couple of services with their accompanying database and have t
 - [ ] [swagger](https://github.com/go-swagger/go-swagger)
 - [x] Add TLS to grpc
 - [ ] Set the jwt claims
+- [ ] Use logstash, elastic search, kibana/grafana
