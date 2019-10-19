@@ -35,7 +35,6 @@ func NewUsersServer(serverEnv string) (*UsersServer, error) {
 	return server, nil
 }
 
-// TODO: validation step for each handler
 func (s *UsersServer) CheckPassword(c *gin.Context) {
 	var (
 		req request.CheckPasswordRequest
@@ -54,29 +53,29 @@ func (s *UsersServer) CheckPassword(c *gin.Context) {
 		return
 	}
 
-	//r, err := s.greeterClient.SayHello(c, &greeter_pb.HelloRequest{Name: req.Name})
-	//if err != nil {
-	//c.JSON(http.StatusBadRequest, err)
-	//return
-	//}
+	r, err := s.usersClient.UsersGetPassword(c, &users_pb.UsersGetPasswordRequest{Username: req.Username})
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+
+	if r == nil {
+		c.JSON(http.StatusNoContent, res)
+		return
+	}
 
 	res = response.CheckPasswordResponse{
-		//Message: r.Message,
+		ID:       r.ID,
+		Password: r.Password,
 	}
 
 	c.JSON(http.StatusOK, res)
 }
 
 func (s *UsersServer) CreateHandler(c *gin.Context) {
-}
-
-func (s *UsersServer) ByIdHandler(c *gin.Context) {
-}
-
-func (s *UsersServer) ListHandler(c *gin.Context) {
 	var (
-		req request.ListRequest
-		res response.ListResponse
+		req request.CreateRequest
+		res response.CreateResponse
 	)
 
 	if err := c.BindJSON(&req); err != nil {
@@ -91,18 +90,45 @@ func (s *UsersServer) ListHandler(c *gin.Context) {
 		return
 	}
 
-	//r, err := s.greeterClient.SayHello(c, &greeter_pb.HelloRequest{Name: req.Name})
-	//if err != nil {
-	//c.JSON(http.StatusBadRequest, err)
-	//return
-	//}
+	r, err := s.usersClient.UsersCreate(c, &users_pb.UsersCreateRequest{
+		Username:  req.Username,
+		Password:  req.Password,
+		Firstname: req.Firstname,
+		Lastname:  req.Lastname})
 
-	// FIXME: return no content
-	//if len(r) > 0 {
-	//c.JSON(http.StatusNoContent, res)
-	//return
-	//}
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
 
+	res = response.CreateResponse{
+		ID: r.ID,
+	}
+
+	c.JSON(http.StatusOK, res)
+}
+
+func (s *UsersServer) ByIdHandler(c *gin.Context) {
+}
+
+// FIXME: update this
+func (s *UsersServer) ListHandler(c *gin.Context) {
+	var (
+		res response.ListResponse
+	)
+
+	r, err := s.usersClient.UsersList(c, &users_pb.UsersListRequest{})
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+
+	if len(r.Users) > 0 {
+		c.JSON(http.StatusNoContent, res)
+		return
+	}
+
+	// FIXME: update this
 	res = response.ListResponse{
 		//Message: r.Message,
 	}
@@ -110,8 +136,10 @@ func (s *UsersServer) ListHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, res)
 }
 
+// FIXME: implement
 func (s *UsersServer) UpdateHandler(c *gin.Context) {
 }
 
+// FIXME: implement
 func (s *UsersServer) DeleteHandler(c *gin.Context) {
 }

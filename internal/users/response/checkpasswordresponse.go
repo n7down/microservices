@@ -1,3 +1,6 @@
 package response
 
-type CheckPasswordResponse struct{}
+type CheckPasswordResponse struct {
+	ID       string `json: "id"`
+	Password string `json: "password"`
+}
