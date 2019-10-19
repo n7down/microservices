@@ -21,4 +21,4 @@ Exercise - make a couple of services with their accompanying database and have t
 - [ ] Set the jwt claims - add user info to the claims - username, firstname, lastname
 - [ ] Use [logstash, elastic search, kibana/grafana](https://github.com/deviantony/docker-elk) for api monitoring
 - [ ] Create permissions for different users - for example setup permissions for a users to only use certain routes
-- [ ] Make a set of v2 apis that use graphql
+- [ ] Make a set of v2 apis that use [graphql and gin](https://github.com/gin-gonic/gin/issues/1217)
