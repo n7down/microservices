@@ -5,9 +5,9 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/n7down/microservices/internal/greeter/pb"
-	"github.com/n7down/microservices/internal/greeter/request"
-	"github.com/n7down/microservices/internal/greeter/response"
+	"github.com/n7down/microservices/internal/client/greeter/pb"
+	"github.com/n7down/microservices/internal/client/greeter/request"
+	"github.com/n7down/microservices/internal/client/greeter/response"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 )

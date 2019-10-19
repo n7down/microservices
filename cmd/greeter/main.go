@@ -5,7 +5,7 @@ import (
 	"log"
 	"net"
 
-	"github.com/n7down/microservices/internal/greeter/pb"
+	"github.com/n7down/microservices/internal/client/greeter/pb"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"

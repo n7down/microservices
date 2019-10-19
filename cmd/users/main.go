@@ -2,11 +2,11 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net"
 
+	"github.com/n7down/microservices/internal/client/users/pb"
 	servers "github.com/n7down/microservices/internal/servers/users"
-	"github.com/n7down/microservices/internal/users/pb"
+	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 )
@@ -18,6 +18,8 @@ const (
 )
 
 func main() {
+	log.SetReportCaller(true)
+
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", port))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)

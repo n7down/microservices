@@ -5,9 +5,9 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/n7down/microservices/internal/users/pb"
-	"github.com/n7down/microservices/internal/users/request"
-	"github.com/n7down/microservices/internal/users/response"
+	"github.com/n7down/microservices/internal/client/users/pb"
+	"github.com/n7down/microservices/internal/client/users/request"
+	"github.com/n7down/microservices/internal/client/users/response"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 )
@@ -29,6 +29,7 @@ func NewUsersServer(serverEnv string) (*UsersServer, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	server := &UsersServer{
 		usersClient: users_pb.NewUsersServiceClient(userConn),
 	}
@@ -142,4 +143,5 @@ func (s *UsersServer) UpdateHandler(c *gin.Context) {
 
 // FIXME: implement
 func (s *UsersServer) DeleteHandler(c *gin.Context) {
+	//id := c.Query("id")
 }

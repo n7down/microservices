@@ -11,8 +11,8 @@ import (
 	"github.com/n7down/microservices/internal/gateway/request"
 	"github.com/n7down/microservices/internal/gateway/response"
 
-	"github.com/n7down/microservices/internal/greeter"
-	"github.com/n7down/microservices/internal/users"
+	"github.com/n7down/microservices/internal/client/greeter"
+	"github.com/n7down/microservices/internal/client/users"
 )
 
 type Gateway struct {
@@ -113,8 +113,10 @@ func (g Gateway) InitRoutes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware)
 	v1 := r.Group("/api/v1")
 
 	auth := v1.Group("/auth")
-	auth.GET("/refresh", authMiddleware.RefreshHandler)
-	auth.POST("/login", authMiddleware.LoginHandler)
+	{
+		auth.GET("/refresh", authMiddleware.RefreshHandler)
+		auth.POST("/login", authMiddleware.LoginHandler)
+	}
 
 	greeterGroup := v1.Group("/greeter")
 	{
@@ -128,8 +130,8 @@ func (g Gateway) InitRoutes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware)
 	{
 		usersGroup.GET("/list", g.usersServer.ListHandler)
 		usersGroup.GET("/byid/:id", g.usersServer.ByIdHandler)
-		usersGroup.GET("/update/:id", g.usersServer.UpdateHandler)
-		usersGroup.GET("/delete/:id", g.usersServer.DeleteHandler)
+		usersGroup.PUT("/update/:id", g.usersServer.UpdateHandler)
+		usersGroup.DELETE("/delete/:id", g.usersServer.DeleteHandler)
 	}
 
 	products := v1.Group("/products")
