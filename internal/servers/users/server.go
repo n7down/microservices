@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/google/uuid"
-	"github.com/n7down/microservices/internal/client/users/pb"
+	"github.com/n7down/microservices/internal/pb/users"
 )
 
 type UsersServer struct {

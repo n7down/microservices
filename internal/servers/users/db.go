@@ -6,6 +6,13 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
+type User struct {
+	ID        string
+	Username  string
+	Firstname string
+	Lastname  string
+}
+
 type UsersDB struct {
 	db *sql.DB
 }
@@ -51,18 +58,18 @@ func (u *UsersDB) Create(id string, username string, password string, firstname 
 }
 
 // TODO: implement
-func (u *UsersDB) Update(id string, username string, password string, firstname string, lastname string) error {
-	return nil
+func (u *UsersDB) Update(id string, username string, password string, firstname string, lastname string) (User, error) {
+	return User{}, nil
 }
 
 // TODO: list only the is_active = 1 users
-func (u *UsersDB) List() error {
-	return nil
+func (u *UsersDB) List() ([]User, error) {
+	return []User{}, nil
 }
 
 // TODO: list only the is_active = 1 users
-func (u *UsersDB) ByID(id string) error {
-	return nil
+func (u *UsersDB) ByID(id string) (User, error) {
+	return User{}, nil
 }
 
 func (u *UsersDB) Delete(id string) error {

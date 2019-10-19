@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/n7down/microservices/internal/client/users/pb"
+	"github.com/n7down/microservices/internal/pb/users"
 	servers "github.com/n7down/microservices/internal/servers/users"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"

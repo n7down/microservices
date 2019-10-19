@@ -5,9 +5,9 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
+	"github.com/n7down/microservices/internal/client/greeter"
+	"github.com/n7down/microservices/internal/client/users"
 	"github.com/n7down/microservices/internal/gateway"
-	"github.com/n7down/microservices/internal/greeter"
-	"github.com/n7down/microservices/internal/users"
 	log "github.com/sirupsen/logrus"
 )
 
