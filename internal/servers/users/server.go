@@ -57,9 +57,21 @@ func (u *UsersServer) UsersUpdate(ctx context.Context, req *users_pb.UsersUpdate
 	return res, nil
 }
 
-// FIXME: implement
-func (u *UsersServer) UsersList(ctx context.Context, req *users_pb.UsersListRequest) (*users_pb.UsersListResponse, error) {
-	return &users_pb.UsersListResponse{}, nil
+func (u *UsersServer) UsersList(req *users_pb.UsersListRequest, stream users_pb.UsersService_UsersListServer) error {
+	users, err := u.db.GetAll()
+	if err != nil {
+		return err
+	}
+
+	for _, u := range users {
+		stream.Send(&users_pb.UsersListResponse{
+			ID:        u.ID,
+			Username:  u.Username,
+			Firstname: u.Firstname,
+			Lastname:  u.Lastname,
+		})
+	}
+	return nil
 }
 
 func (u *UsersServer) UsersByID(ctx context.Context, req *users_pb.UsersByIDRequest) (*users_pb.UsersByIDResponse, error) {

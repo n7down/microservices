@@ -39,15 +39,11 @@ message UsersUpdateResponse {
 message UsersListRequest {
 }
 
-message User {
+message UsersListResponse {
 	string ID = 1;
 	string Username = 2;
 	string Firstname = 3;
 	string Lastname = 4;
-}
-
-message UsersListResponse {
-	repeated User Users = 1;
 }
 
 message UsersByIDRequest {
@@ -70,11 +66,11 @@ message UsersDeleteResponse {
 }
 
 service UsersService {
-	rpc UsersGetPassword (UsersGetPasswordRequest) returns (UsersGetPasswordResponse) {}
-	rpc UsersCreate (UsersCreateRequest) returns (UsersCreateResponse) {}
-	rpc UsersUpdate (UsersUpdateRequest) returns (UsersUpdateResponse) {}
-	rpc UsersList (UsersListRequest) returns (UsersListResponse) {}
-	rpc UsersByID (UsersByIDRequest) returns (UsersByIDResponse) {}
-	rpc UsersDelete (UsersDeleteRequest) returns (UsersDeleteResponse) {}
+	rpc UsersGetPassword (UsersGetPasswordRequest) returns (UsersGetPasswordResponse);
+	rpc UsersCreate (UsersCreateRequest) returns (UsersCreateResponse);
+	rpc UsersUpdate (UsersUpdateRequest) returns (UsersUpdateResponse);
+	rpc UsersList (UsersListRequest) returns (stream UsersListResponse);
+	rpc UsersByID (UsersByIDRequest) returns (UsersByIDResponse);
+	rpc UsersDelete (UsersDeleteRequest) returns (UsersDeleteResponse);
 }
 

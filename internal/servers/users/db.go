@@ -84,9 +84,19 @@ func (u *UsersDB) Update(id string, username string, firstname string, lastname 
 	}, nil
 }
 
-// TODO: list only the is_active = 1 users
-func (u *UsersDB) List() ([]User, error) {
-	return []User{}, nil
+func (u *UsersDB) GetAll() ([]User, error) {
+	users := []User{}
+	query := `SELECT id, username, firstname, lastname FROM users WHERE is_active = 1`
+	rows, err := u.db.Query(query)
+	for rows.Next() {
+		var user User
+		err = rows.Scan(&user.ID, &user.Username, &user.Firstname, &user.Lastname)
+		if err != nil {
+			return users, err
+		}
+		users = append(users, user)
+	}
+	return users, nil
 }
 
 func (u *UsersDB) ByID(id string) (User, error) {

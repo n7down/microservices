@@ -141,7 +141,7 @@ func (g *Gateway) InitV1Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddlewa
 	usersGroup.Use(authMiddleware.MiddlewareFunc())
 	{
 		usersGroup.GET("/list", g.usersServer.ListHandler)
-		usersGroup.GET("/byid/:id", g.usersServer.ByIdHandler)
+		usersGroup.GET("/byid/:id", g.usersServer.ByIDHandler)
 		usersGroup.PUT("/update/:id", g.usersServer.UpdateHandler)
 		usersGroup.DELETE("/delete/:id", g.usersServer.DeleteHandler)
 	}

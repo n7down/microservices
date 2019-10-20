@@ -2,6 +2,7 @@ package users
 
 import (
 	"crypto/tls"
+	"io"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -110,7 +111,7 @@ func (s *UsersServer) CreateHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, res)
 }
 
-func (s *UsersServer) ByIdHandler(c *gin.Context) {
+func (s *UsersServer) ByIDHandler(c *gin.Context) {
 	var (
 		id  string = c.Param("id")
 		req request.ByIDRequest
@@ -145,26 +146,40 @@ func (s *UsersServer) ByIdHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, res)
 }
 
-// FIXME: update this
 func (s *UsersServer) ListHandler(c *gin.Context) {
 	var (
 		res response.ListResponse
 	)
 
-	r, err := s.usersClient.UsersList(c, &users_pb.UsersListRequest{})
+	stream, err := s.usersClient.UsersList(c, &users_pb.UsersListRequest{})
 	if err != nil {
 		c.JSON(http.StatusBadRequest, err)
 		return
 	}
 
-	if len(r.Users) > 0 {
-		c.JSON(http.StatusNoContent, res)
-		return
+	for {
+		r, err := stream.Recv()
+		if err != io.EOF {
+			break
+		}
+
+		if err != nil {
+			c.JSON(http.StatusBadRequest, err)
+			return
+		}
+
+		user := response.User{
+			ID:        r.ID,
+			Username:  r.Username,
+			Firstname: r.Firstname,
+			Lastname:  r.Lastname,
+		}
+		res.Users = append(res.Users, user)
 	}
 
-	// FIXME: update this
-	res = response.ListResponse{
-		//Message: r.Message,
+	if len(res.Users) > 0 {
+		c.JSON(http.StatusNoContent, res)
+		return
 	}
 
 	c.JSON(http.StatusOK, res)
