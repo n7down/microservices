@@ -2,24 +2,22 @@ package request
 
 import (
 	"net/url"
+
+	"github.com/n7down/microservices/internal/utils"
 )
 
-type CreateRequest struct {
+type UpdateRequest struct {
+	ID        string
 	Username  string `json: "username" binding: "required"`
-	Password  string `json: "password" binding: "required"`
 	Firstname string `json: "firstname" binding: "required"`
 	Lastname  string `json: "lastname" binding: "required"`
 }
 
-func (r *CreateRequest) Validate() url.Values {
+func (r *UpdateRequest) Validate() url.Values {
 	errs := url.Values{}
 
 	if r.Username == "" {
 		errs.Add("username", "The username field is required!")
-	}
-
-	if r.Password == "" {
-		errs.Add("password", "The password field is required!")
 	}
 
 	if r.Firstname == "" {
@@ -28,6 +26,14 @@ func (r *CreateRequest) Validate() url.Values {
 
 	if r.Lastname == "" {
 		errs.Add("lastname", "The lastname field is required!")
+	}
+
+	if r.ID == "" {
+		errs.Add("id", "The id field is required!")
+	}
+
+	if !utils.IsValidUUID(r.ID) {
+		errs.Add("id", "The id is not a valid format!")
 	}
 
 	return errs

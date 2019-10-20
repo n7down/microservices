@@ -95,7 +95,8 @@ func (s *UsersServer) CreateHandler(c *gin.Context) {
 		Username:  req.Username,
 		Password:  req.Password,
 		Firstname: req.Firstname,
-		Lastname:  req.Lastname})
+		Lastname:  req.Lastname,
+	})
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, err)
@@ -110,6 +111,38 @@ func (s *UsersServer) CreateHandler(c *gin.Context) {
 }
 
 func (s *UsersServer) ByIdHandler(c *gin.Context) {
+	var (
+		id  string = c.Param("id")
+		req request.ByIDRequest
+		res response.ByIDResponse
+	)
+
+	req.ID = id
+
+	// validate input data
+	if validationErrors := req.Validate(); len(validationErrors) > 0 {
+		err := map[string]interface{}{"validationError": validationErrors}
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+
+	r, err := s.usersClient.UsersByID(c, &users_pb.UsersByIDRequest{
+		ID: id,
+	})
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+
+	res = response.ByIDResponse{
+		ID:        r.ID,
+		Username:  r.Username,
+		Firstname: r.Firstname,
+		Lastname:  r.Lastname,
+	}
+
+	c.JSON(http.StatusOK, res)
 }
 
 // FIXME: update this
@@ -137,11 +170,78 @@ func (s *UsersServer) ListHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, res)
 }
 
-// FIXME: implement
 func (s *UsersServer) UpdateHandler(c *gin.Context) {
+	var (
+		id  string = c.Param("id")
+		req request.UpdateRequest
+		res response.UpdateResponse
+	)
+
+	if err := c.BindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+
+	req.ID = id
+
+	// validate input data
+	if validationErrors := req.Validate(); len(validationErrors) > 0 {
+		err := map[string]interface{}{"validationError": validationErrors}
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+
+	r, err := s.usersClient.UsersUpdate(c, &users_pb.UsersUpdateRequest{
+		ID:        req.ID,
+		Username:  req.Username,
+		Firstname: req.Firstname,
+		Lastname:  req.Lastname,
+	})
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+
+	res = response.UpdateResponse{
+		ID:        r.ID,
+		Username:  r.Username,
+		Firstname: r.Firstname,
+		Lastname:  r.Lastname,
+	}
+
+	c.JSON(http.StatusOK, res)
 }
 
-// FIXME: implement
 func (s *UsersServer) DeleteHandler(c *gin.Context) {
-	//id := c.Query("id")
+	var (
+		id  string = c.Param("id")
+		res response.DeleteResponse
+	)
+
+	req := request.DeleteRequest{
+		ID: id,
+	}
+
+	// validate input data
+	if validationErrors := req.Validate(); len(validationErrors) > 0 {
+		err := map[string]interface{}{"validationError": validationErrors}
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+
+	r, err := s.usersClient.UsersDelete(c, &users_pb.UsersDeleteRequest{
+		ID: req.ID,
+	})
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+
+	res = response.DeleteResponse{
+		ID: r.ID,
+	}
+
+	c.JSON(http.StatusOK, res)
 }

@@ -2,11 +2,11 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net"
 
 	"github.com/n7down/microservices/internal/pb/greeter"
 	server "github.com/n7down/microservices/internal/servers/greeter"
+	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 )
@@ -18,6 +18,8 @@ const (
 )
 
 func main() {
+	log.SetReportCaller(true)
+
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", port))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
@@ -28,7 +30,7 @@ func main() {
 		log.Fatalf("could not load TLS keys: %s", err)
 	}
 
-	fmt.Printf("Listening on port: %s\n", port)
+	log.Infof("Listening on port: %s\n", port)
 	grpcServer := grpc.NewServer(grpc.Creds(creds))
 	greeter_pb.RegisterGreeterServiceServer(grpcServer, &server.GreeterServer{})
 	grpcServer.Serve(lis)

@@ -31,6 +31,9 @@ message UsersUpdateRequest {
 
 message UsersUpdateResponse {
 	string ID = 1;
+	string Username = 2;
+	string Firstname = 3;
+	string Lastname = 4;
 }
 
 message UsersListRequest {

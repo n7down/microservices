@@ -12,7 +12,7 @@ func (r *CheckPasswordRequest) Validate() url.Values {
 	errs := url.Values{}
 
 	if r.Username == "" {
-		errs.Add("username", "The name field is required!")
+		errs.Add("username", "The username field is required!")
 	}
 
 	return errs

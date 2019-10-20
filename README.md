@@ -19,6 +19,7 @@ Exercise - make a couple of services with their accompanying database and have t
 - [ ] [swagger](https://github.com/go-swagger/go-swagger)
 - [x] Add TLS to grpc
 - [ ] Set the jwt claims - add user info to the claims - username, firstname, lastname
-- [ ] Use [logstash, elastic search, kibana/grafana](https://github.com/deviantony/docker-elk) for api monitoring
+- [ ] Use [logstash, elastic search, kibana/grafana](https://github.com/deviantony/docker-elk) for api monitoring - send logs and time it take for each request
 - [ ] Create permissions for different users - for example setup permissions for a users to only use certain routes
 - [ ] Make a set of v2 apis that use [graphql and gin](https://github.com/gin-gonic/gin/issues/1217)
+- [ ] Create a stored procedure that check if the user exists and creates it otherwise

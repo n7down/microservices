@@ -30,8 +30,13 @@ func main() {
 		log.Fatalf("could not load TLS keys: %s", err)
 	}
 
-	fmt.Printf("Listening on port: %s\n", port)
+	usersServer, err := servers.NewUsersServer()
+	if err != nil {
+		log.Fatal("unable to start users server")
+	}
+
+	log.Info("Listening on port: %s\n", port)
 	grpcServer := grpc.NewServer(grpc.Creds(creds))
-	users_pb.RegisterUsersServiceServer(grpcServer, &servers.UsersServer{})
+	users_pb.RegisterUsersServiceServer(grpcServer, usersServer)
 	grpcServer.Serve(lis)
 }

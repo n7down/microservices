@@ -48,18 +48,40 @@ func (u *UsersDB) GetPassword(username string) (string, string, error) {
 	}
 }
 
+// FIXME: use stored procedure that checks if the username exists - if it does return it
+// otherwise insert the data
 func (u *UsersDB) Create(id string, username string, password string, firstname string, lastname string) error {
 	query := `INSERT INTO users(id, username, password, firstname, lastname, is_active) VALUES (?, ?, ?, ?, ?, 1)`
-	_, err := u.db.Exec(query, id, username, password, firstname, lastname)
+	//query := `INSERT INTO users(id, username, password, firstname, lastname, is_active) VALUES (?, ?, ?, ?, ?, 1) WHERE NOT EXISTS (SELECT username FROM users WHERE username = ?) LIMIT 1`
+	_, err := u.db.Exec(query, id, username, password, firstname, lastname, username)
+
+	//me, ok := err.(*mysql.MySQLError)
+	//if !ok {
+	//return err
+	//}
+	//if me.Number == 1062 {
+	//return errors.New("username already exists")
+	//}
+
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 
-// TODO: implement
-func (u *UsersDB) Update(id string, username string, password string, firstname string, lastname string) (User, error) {
-	return User{}, nil
+func (u *UsersDB) Update(id string, username string, firstname string, lastname string) (User, error) {
+	query := `UPDATE users SET username = ?, firstname = ?, lastname = ? WHERE id = ? AND is_active = 1`
+	_, err := u.db.Exec(query, username, firstname, lastname, id)
+	if err != nil {
+		return User{}, err
+	}
+	return User{
+		ID:        id,
+		Username:  username,
+		Firstname: firstname,
+		Lastname:  lastname,
+	}, nil
 }
 
 // TODO: list only the is_active = 1 users
@@ -67,8 +89,18 @@ func (u *UsersDB) List() ([]User, error) {
 	return []User{}, nil
 }
 
-// TODO: list only the is_active = 1 users
 func (u *UsersDB) ByID(id string) (User, error) {
+	var user User
+	query := `SELECT id, username, firstname, lastname FROM users WHERE is_active = 1 AND id = ?`
+	row := u.db.QueryRow(query, id)
+	switch err := row.Scan(&user.ID, &user.Username, &user.Firstname, &user.Lastname); err {
+	case sql.ErrNoRows:
+		return user, errors.New("id invalid")
+	case nil:
+		return user, nil
+	default:
+		return user, err
+	}
 	return User{}, nil
 }
 

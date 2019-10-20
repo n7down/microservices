@@ -42,14 +42,20 @@ func main() {
 		return
 	}
 
-	err = gateway.InitRoutes(router, authMiddleware)
+	err = gateway.InitV1Routes(router, authMiddleware)
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+
+	err = gateway.InitV2Routes(router, authMiddleware)
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
 
 	routerPort := fmt.Sprintf(":%s", gatewayPort)
-	fmt.Printf("Listening on port: %s\n", gatewayPort)
+	log.Infof("Listening on port: %s\n", gatewayPort)
 	err = gateway.Run(router, routerPort)
 	if err != nil {
 		log.Fatal(err)

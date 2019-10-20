@@ -27,7 +27,7 @@ func NewGateway(g *greeter.GreeterServer, u *users.UsersServer) *Gateway {
 	}
 }
 
-func (g Gateway) authLogin(in request.LoginRequest) (*response.LoginResponse, error) {
+func (g *Gateway) authLogin(in request.LoginRequest) (*response.LoginResponse, error) {
 	//var user users.User
 
 	// FIXME: get the user
@@ -59,7 +59,15 @@ func (g Gateway) authLogin(in request.LoginRequest) (*response.LoginResponse, er
 	return &response.LoginResponse{}, jwt.ErrFailedAuthentication
 }
 
-func (g Gateway) InitAuthRoutes(r *gin.Engine) (*jwt.GinJWTMiddleware, error) {
+func (g *Gateway) logResponseLatencyMiddleware(c *gin.Context) {
+	start := time.Now()
+	c.Next()
+
+	// FIXME: log the end time
+	_ = time.Now().Sub(start)
+}
+
+func (g *Gateway) InitAuthRoutes(r *gin.Engine) (*jwt.GinJWTMiddleware, error) {
 	var loginResponse *response.LoginResponse
 
 	authMiddleware, err := jwt.New(&jwt.GinJWTMiddleware{
@@ -109,8 +117,9 @@ func (g Gateway) InitAuthRoutes(r *gin.Engine) (*jwt.GinJWTMiddleware, error) {
 	return authMiddleware, err
 }
 
-func (g Gateway) InitRoutes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) error {
+func (g *Gateway) InitV1Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) error {
 	v1 := r.Group("/api/v1")
+	v1.Use(g.logResponseLatencyMiddleware)
 
 	auth := v1.Group("/auth")
 	{
@@ -124,6 +133,9 @@ func (g Gateway) InitRoutes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware)
 	}
 
 	v1.POST("/users/create", g.usersServer.CreateHandler)
+	//v1.GET("/users/byid/:id", g.usersServer.ByIdHandler)
+	//v1.PUT("/users/update/:id", g.usersServer.UpdateHandler)
+	//v1.DELETE("/users/delete/:id", g.usersServer.DeleteHandler)
 
 	usersGroup := v1.Group("/users")
 	usersGroup.Use(authMiddleware.MiddlewareFunc())
@@ -151,7 +163,12 @@ func (g Gateway) InitRoutes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware)
 	return nil
 }
 
-func (g Gateway) Run(router *gin.Engine, routerPort string) error {
+// FIXME: implement - use graphql
+func (g *Gateway) InitV2Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) error {
+	return nil
+}
+
+func (g *Gateway) Run(router *gin.Engine, routerPort string) error {
 	err := http.ListenAndServe(routerPort, router)
 	if err != nil {
 		return err
