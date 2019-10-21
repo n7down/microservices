@@ -9,7 +9,6 @@ import (
 	"github.com/n7down/microservices/internal/client/users/request"
 	"github.com/n7down/microservices/internal/client/users/response"
 	"github.com/n7down/microservices/internal/pb/users"
-	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 )
@@ -160,7 +159,6 @@ func (s *UsersServer) ListHandler(c *gin.Context) {
 
 	for {
 		r, err := stream.Recv()
-		log.Infof("r: %v err: %v", r, err)
 		if err == io.EOF {
 			break
 		}
@@ -176,9 +174,7 @@ func (s *UsersServer) ListHandler(c *gin.Context) {
 			Firstname: r.Firstname,
 			Lastname:  r.Lastname,
 		}
-		log.Infof("user: %v", user)
 		res.Users = append(res.Users, user)
-		log.Infof("res: %v", res)
 	}
 
 	if len(res.Users) == 0 {

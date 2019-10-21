@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	//"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/n7down/microservices/internal/client/greeter"
@@ -20,14 +19,12 @@ func main() {
 	router := gin.Default()
 	log.SetReportCaller(true)
 
-	//greeterServer, err := greeter.NewGreeterServer(os.Getenv("GREETER_HOST"))
 	greeterServer, err := greeter.NewGreeterServer(utils.GetEnv("GREETER_HOST", "127.0.0.1:8081"))
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
 
-	//usersServer, err := users.NewUsersServer(os.Getenv("USERS_HOST"))
 	usersServer, err := users.NewUsersServer(utils.GetEnv("USERS_HOST", "127.0.0.1:8082"))
 	if err != nil {
 		log.Fatal(err)
