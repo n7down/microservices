@@ -35,7 +35,7 @@ func main() {
 		log.Fatal("unable to start users server")
 	}
 
-	log.Info("Listening on port: %s\n", port)
+	log.Infof("Listening on port: %s\n", port)
 	grpcServer := grpc.NewServer(grpc.Creds(creds))
 	users_pb.RegisterUsersServiceServer(grpcServer, usersServer)
 	grpcServer.Serve(lis)

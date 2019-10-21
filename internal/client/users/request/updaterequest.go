@@ -8,9 +8,9 @@ import (
 
 type UpdateRequest struct {
 	ID        string
-	Username  string `json: "username" binding: "required"`
-	Firstname string `json: "firstname" binding: "required"`
-	Lastname  string `json: "lastname" binding: "required"`
+	Username  string `json:"username" binding:"required"`
+	Firstname string `json:"firstname" binding:"required"`
+	Lastname  string `json:"lastname" binding:"required"`
 }
 
 func (r *UpdateRequest) Validate() url.Values {

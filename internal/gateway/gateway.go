@@ -132,13 +132,9 @@ func (g *Gateway) InitV1Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddlewa
 		greeterGroup.GET("/hello", g.greeterServer.HelloHandler)
 	}
 
-	v1.POST("/users/create", g.usersServer.CreateHandler)
-	//v1.GET("/users/byid/:id", g.usersServer.ByIdHandler)
-	//v1.PUT("/users/update/:id", g.usersServer.UpdateHandler)
-	//v1.DELETE("/users/delete/:id", g.usersServer.DeleteHandler)
-
 	usersGroup := v1.Group("/users")
-	usersGroup.Use(authMiddleware.MiddlewareFunc())
+	usersGroup.POST("/create", g.usersServer.CreateHandler)
+	//usersGroup.Use(authMiddleware.MiddlewareFunc())
 	{
 		usersGroup.GET("/list", g.usersServer.ListHandler)
 		usersGroup.GET("/byid/:id", g.usersServer.ByIDHandler)

@@ -5,10 +5,10 @@ import (
 )
 
 type CreateRequest struct {
-	Username  string `json: "username" binding: "required"`
-	Password  string `json: "password" binding: "required"`
-	Firstname string `json: "firstname" binding: "required"`
-	Lastname  string `json: "lastname" binding: "required"`
+	Username  string `json:"username" binding:"required"`
+	Password  string `json:"password" binding:"required"`
+	Firstname string `json:"firstname" binding:"required"`
+	Lastname  string `json:"lastname" binding:"required"`
 }
 
 func (r *CreateRequest) Validate() url.Values {

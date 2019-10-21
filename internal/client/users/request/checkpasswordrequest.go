@@ -5,7 +5,7 @@ import (
 )
 
 type CheckPasswordRequest struct {
-	Username string `json: "username" binding: "required"`
+	Username string `json:"username" binding:"required"`
 }
 
 func (r *CheckPasswordRequest) Validate() url.Values {

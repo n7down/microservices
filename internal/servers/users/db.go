@@ -53,7 +53,7 @@ func (u *UsersDB) GetPassword(username string) (string, string, error) {
 func (u *UsersDB) Create(id string, username string, password string, firstname string, lastname string) error {
 	query := `INSERT INTO users(id, username, password, firstname, lastname, is_active) VALUES (?, ?, ?, ?, ?, 1)`
 	//query := `INSERT INTO users(id, username, password, firstname, lastname, is_active) VALUES (?, ?, ?, ?, ?, 1) WHERE NOT EXISTS (SELECT username FROM users WHERE username = ?) LIMIT 1`
-	_, err := u.db.Exec(query, id, username, password, firstname, lastname, username)
+	_, err := u.db.Exec(query, id, username, password, firstname, lastname)
 
 	//me, ok := err.(*mysql.MySQLError)
 	//if !ok {

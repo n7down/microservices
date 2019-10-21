@@ -1,5 +1,5 @@
 package response
 
 type DeleteResponse struct {
-	ID string `json: "id"`
+	ID string `json:"id"`
 }
