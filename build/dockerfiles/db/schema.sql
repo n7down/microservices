@@ -3,9 +3,9 @@
 
 CREATE DATABASE `users`
 
-CREATE TABLE `users`.`users` (`id` VARCHAR(36) NOT NULL, `username` VARCHAR(100) NOT NULL, `password` VARCHAR(100) NOT NULL, `firstname` VARCHAR(100) NOT NULL, `lastname` VARCHAR(100) NOT NULL, `is_active` BOOLEAN NOT NULL DEFAULT 1, PRIMARY KEY(`id`));
+CREATE TABLE `users`.`userinfo` (`id` VARCHAR(36) NOT NULL, `username` VARCHAR(100) NOT NULL, `password` VARCHAR(100) NOT NULL, `firstname` VARCHAR(100) NOT NULL, `lastname` VARCHAR(100) NOT NULL, `is_active` BOOLEAN NOT NULL DEFAULT 1, PRIMARY KEY(`id`));
 
-CREATE UNIQUE INDEX `username_unique_index` ON `users`.`users` (`username`);
+CREATE UNIQUE INDEX `username_unique_index` ON `users`.`userinfo` (`username`);
 
 /* FIXME: combine CREATE_USER and INSERT_NAME as one stored
    procedure that checks if the username exists and insert it otherwise
