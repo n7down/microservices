@@ -68,6 +68,7 @@ func (g *Gateway) logResponseLatencyMiddleware(c *gin.Context) {
 }
 
 func (g *Gateway) InitAuthRoutes(r *gin.Engine) (*jwt.GinJWTMiddleware, error) {
+	const identityKey = "username"
 	var loginResponse *response.LoginResponse
 
 	authMiddleware, err := jwt.New(&jwt.GinJWTMiddleware{
@@ -75,8 +76,24 @@ func (g *Gateway) InitAuthRoutes(r *gin.Engine) (*jwt.GinJWTMiddleware, error) {
 		Key:              []byte(os.Getenv("AUTH_KEY")),
 		Timeout:          time.Duration(24) * time.Hour,
 		MaxRefresh:       time.Duration(24) * time.Hour,
-		IdentityKey:      "id",
+		IdentityKey:      identityKey,
 		SigningAlgorithm: "HS256",
+		PayloadFunc: func(data interface{}) jwt.MapClaims {
+			if v, ok := data.(*response.LoginResponse); ok {
+				return jwt.MapClaims{
+					identityKey: v.Username,
+					"firstname": v.FirstName,
+					"lastname":  v.LastName,
+				}
+			}
+			return jwt.MapClaims{}
+		},
+		IdentityHandler: func(c *gin.Context) interface{} {
+			claims := jwt.ExtractClaims(c)
+			return &response.LoginResponse{
+				Username: claims[identityKey].(string),
+			}
+		},
 		Authenticator: func(c *gin.Context) (interface{}, error) {
 			var in request.LoginRequest
 			if err := c.ShouldBind(&in); err != nil {

@@ -6,7 +6,6 @@ Exercise - make a couple of services with their accompanying database and have t
 
 ## Todo
 - [x] Make a users service
-- [ ] Test users service
 - [ ] Make a products service
 - [x] Create a gateway - use JWT for auth
 - [ ] Create a basket service and uses both the users and products service
@@ -19,7 +18,7 @@ Exercise - make a couple of services with their accompanying database and have t
 - [ ] Build out activity for a user - can use async calls through mosquitto and sync calls to get activity
 - [ ] [swagger](https://github.com/go-swagger/go-swagger)
 - [x] Add TLS to grpc
-- [ ] Set the jwt claims - add user info to the claims - username, firstname, lastname
+- [x] Set the jwt claims - add user info to the claims - username, firstname, lastname
 - [ ] Use [logstash, elastic search, kibana/grafana](https://github.com/deviantony/docker-elk) for api monitoring - send logs and time it take for each request
 - [ ] Create permissions for different users - for example setup permissions for a users to only use certain routes
 - [ ] Make a set of v2 apis that use [graphql and gin](https://github.com/gin-gonic/gin/issues/1217)
