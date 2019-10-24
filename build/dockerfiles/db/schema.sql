@@ -1,5 +1,5 @@
 
-/* FIXME: create a database for the users, products and basket service in here */
+/* users */
 
 CREATE DATABASE `users`;
 USE `users`;
@@ -7,6 +7,13 @@ USE `users`;
 CREATE TABLE `users`.`userinfo` (`id` VARCHAR(36) NOT NULL, `username` VARCHAR(100) NOT NULL, `password` VARCHAR(100) NOT NULL, `firstname` VARCHAR(100) NOT NULL, `lastname` VARCHAR(100) NOT NULL, `is_active` BOOLEAN NOT NULL DEFAULT 1, PRIMARY KEY(`id`));
 
 CREATE UNIQUE INDEX `username_unique_index` ON `users`.`userinfo` (`username`);
+
+/* products */
+
+CREATE DATABASE `products`;
+USE `products`;
+
+CREATE TABLE `products`.`product` (`id` VARCHAR(36) NOT NULL, `name` VARCHAR(100) NOT NULL, `sold_by` VARCHAR(36) NOT NULL, `is_active` BOOLEAN NOT NULL DEFAULT 1, PRIMARY KEY(`id`));
 
 /* FIXME: combine CREATE_USER and INSERT_NAME as one stored
    procedure that checks if the username exists and insert it otherwise
