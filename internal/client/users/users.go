@@ -1,9 +1,11 @@
 package users
 
 import (
+	"context"
 	"crypto/tls"
 	"io"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/n7down/microservices/internal/client/users/request"
@@ -14,7 +16,8 @@ import (
 )
 
 const (
-	cert = "cert.pem"
+	cert        = "cert.pem"
+	FIVEMINUTES = 5 * time.Minute
 )
 
 type UsersServer struct {
@@ -38,6 +41,9 @@ func NewUsersServer(serverEnv string) (*UsersServer, error) {
 }
 
 func (s *UsersServer) CheckPassword(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(c, FIVEMINUTES)
+	defer cancel()
+
 	var (
 		req request.CheckPasswordRequest
 		res response.CheckPasswordResponse
@@ -55,7 +61,7 @@ func (s *UsersServer) CheckPassword(c *gin.Context) {
 		return
 	}
 
-	r, err := s.usersClient.UsersGetPassword(c, &users_pb.UsersGetPasswordRequest{Username: req.Username})
+	r, err := s.usersClient.UsersGetPassword(ctx, &users_pb.UsersGetPasswordRequest{Username: req.Username})
 	if err != nil {
 		c.JSON(http.StatusBadRequest, err)
 		return
@@ -112,6 +118,9 @@ func (s *UsersServer) CreateHandler(c *gin.Context) {
 }
 
 func (s *UsersServer) ByIDHandler(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(c, FIVEMINUTES)
+	defer cancel()
+
 	var (
 		id  string = c.Param("id")
 		req request.ByIDRequest
@@ -127,7 +136,7 @@ func (s *UsersServer) ByIDHandler(c *gin.Context) {
 		return
 	}
 
-	r, err := s.usersClient.UsersByID(c, &users_pb.UsersByIDRequest{
+	r, err := s.usersClient.UsersByID(ctx, &users_pb.UsersByIDRequest{
 		ID: id,
 	})
 
@@ -147,11 +156,14 @@ func (s *UsersServer) ByIDHandler(c *gin.Context) {
 }
 
 func (s *UsersServer) ListHandler(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(c, FIVEMINUTES)
+	defer cancel()
+
 	var (
 		res response.ListResponse
 	)
 
-	stream, err := s.usersClient.UsersList(c, &users_pb.UsersListRequest{})
+	stream, err := s.usersClient.UsersList(ctx, &users_pb.UsersListRequest{})
 	if err != nil {
 		c.JSON(http.StatusBadRequest, err)
 		return
@@ -186,6 +198,9 @@ func (s *UsersServer) ListHandler(c *gin.Context) {
 }
 
 func (s *UsersServer) UpdateHandler(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(c, FIVEMINUTES)
+	defer cancel()
+
 	var (
 		id  string = c.Param("id")
 		req request.UpdateRequest
@@ -206,7 +221,7 @@ func (s *UsersServer) UpdateHandler(c *gin.Context) {
 		return
 	}
 
-	r, err := s.usersClient.UsersUpdate(c, &users_pb.UsersUpdateRequest{
+	r, err := s.usersClient.UsersUpdate(ctx, &users_pb.UsersUpdateRequest{
 		ID:        req.ID,
 		Username:  req.Username,
 		Firstname: req.Firstname,
@@ -229,6 +244,9 @@ func (s *UsersServer) UpdateHandler(c *gin.Context) {
 }
 
 func (s *UsersServer) DeleteHandler(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(c, FIVEMINUTES)
+	defer cancel()
+
 	var (
 		id  string = c.Param("id")
 		res response.DeleteResponse
@@ -245,7 +263,7 @@ func (s *UsersServer) DeleteHandler(c *gin.Context) {
 		return
 	}
 
-	r, err := s.usersClient.UsersDelete(c, &users_pb.UsersDeleteRequest{
+	r, err := s.usersClient.UsersDelete(ctx, &users_pb.UsersDeleteRequest{
 		ID: req.ID,
 	})
 
