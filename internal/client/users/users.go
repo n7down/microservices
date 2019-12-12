@@ -20,11 +20,11 @@ const (
 	FIVEMINUTES = 5 * time.Minute
 )
 
-type UsersServer struct {
+type UsersClient struct {
 	usersClient users_pb.UsersServiceClient
 }
 
-func NewUsersServer(serverEnv string) (*UsersServer, error) {
+func NewUsersClient(serverEnv string) (*UsersClient, error) {
 	config := &tls.Config{
 		InsecureSkipVerify: true,
 	}
@@ -34,13 +34,13 @@ func NewUsersServer(serverEnv string) (*UsersServer, error) {
 		return nil, err
 	}
 
-	server := &UsersServer{
+	server := &UsersClient{
 		usersClient: users_pb.NewUsersServiceClient(userConn),
 	}
 	return server, nil
 }
 
-func (s *UsersServer) CheckPassword(c *gin.Context) {
+func (s *UsersClient) CheckPassword(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c, FIVEMINUTES)
 	defer cancel()
 
@@ -80,7 +80,7 @@ func (s *UsersServer) CheckPassword(c *gin.Context) {
 	c.JSON(http.StatusOK, res)
 }
 
-func (s *UsersServer) CreateHandler(c *gin.Context) {
+func (s *UsersClient) CreateHandler(c *gin.Context) {
 	var (
 		req request.CreateRequest
 		res response.CreateResponse
@@ -117,7 +117,7 @@ func (s *UsersServer) CreateHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, res)
 }
 
-func (s *UsersServer) ByIDHandler(c *gin.Context) {
+func (s *UsersClient) ByIDHandler(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c, FIVEMINUTES)
 	defer cancel()
 
@@ -155,7 +155,7 @@ func (s *UsersServer) ByIDHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, res)
 }
 
-func (s *UsersServer) ListHandler(c *gin.Context) {
+func (s *UsersClient) ListHandler(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c, FIVEMINUTES)
 	defer cancel()
 
@@ -197,7 +197,7 @@ func (s *UsersServer) ListHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, res)
 }
 
-func (s *UsersServer) UpdateHandler(c *gin.Context) {
+func (s *UsersClient) UpdateHandler(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c, FIVEMINUTES)
 	defer cancel()
 
@@ -243,7 +243,7 @@ func (s *UsersServer) UpdateHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, res)
 }
 
-func (s *UsersServer) DeleteHandler(c *gin.Context) {
+func (s *UsersClient) DeleteHandler(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c, FIVEMINUTES)
 	defer cancel()
 

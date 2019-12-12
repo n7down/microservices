@@ -1,4 +1,4 @@
-package gateway
+package apigateway
 
 import (
 	"net/http"
@@ -8,26 +8,26 @@ import (
 	jwt "github.com/appleboy/gin-jwt"
 	"github.com/gin-gonic/gin"
 
-	"github.com/n7down/microservices/internal/gateway/request"
-	"github.com/n7down/microservices/internal/gateway/response"
+	"github.com/n7down/microservices/internal/apigateway/request"
+	"github.com/n7down/microservices/internal/apigateway/response"
 
 	"github.com/n7down/microservices/internal/client/greeter"
 	"github.com/n7down/microservices/internal/client/users"
 )
 
-type Gateway struct {
-	greeterServer *greeter.GreeterServer
-	usersServer   *users.UsersServer
+type APIGateway struct {
+	greeterClient *greeter.GreeterClient
+	usersClient   *users.UsersClient
 }
 
-func NewGateway(g *greeter.GreeterServer, u *users.UsersServer) *Gateway {
-	return &Gateway{
-		greeterServer: g,
-		usersServer:   u,
+func NewAPIGateway(g *greeter.GreeterClient, u *users.UsersClient) *APIGateway {
+	return &APIGateway{
+		greeterClient: g,
+		usersClient:   u,
 	}
 }
 
-func (g *Gateway) authLogin(in request.LoginRequest) (*response.LoginResponse, error) {
+func (g *APIGateway) authLogin(in request.LoginRequest) (*response.LoginResponse, error) {
 	//var user users.User
 
 	// FIXME: get the user
@@ -59,7 +59,7 @@ func (g *Gateway) authLogin(in request.LoginRequest) (*response.LoginResponse, e
 	return &response.LoginResponse{}, jwt.ErrFailedAuthentication
 }
 
-func (g *Gateway) logResponseLatencyMiddleware(c *gin.Context) {
+func (g *APIGateway) logResponseLatencyMiddleware(c *gin.Context) {
 	start := time.Now()
 	c.Next()
 
@@ -67,7 +67,7 @@ func (g *Gateway) logResponseLatencyMiddleware(c *gin.Context) {
 	_ = time.Now().Sub(start)
 }
 
-func (g *Gateway) InitAuthRoutes(r *gin.Engine) (*jwt.GinJWTMiddleware, error) {
+func (g *APIGateway) InitAuthRoutes(r *gin.Engine) (*jwt.GinJWTMiddleware, error) {
 	const identityKey = "username"
 	var loginResponse *response.LoginResponse
 
@@ -134,7 +134,7 @@ func (g *Gateway) InitAuthRoutes(r *gin.Engine) (*jwt.GinJWTMiddleware, error) {
 	return authMiddleware, err
 }
 
-func (g *Gateway) InitV1Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) error {
+func (g *APIGateway) InitV1Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) error {
 	v1 := r.Group("/api/v1")
 	v1.Use(g.logResponseLatencyMiddleware)
 
@@ -146,17 +146,17 @@ func (g *Gateway) InitV1Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddlewa
 
 	greeterGroup := v1.Group("/greeter")
 	{
-		greeterGroup.GET("/hello", g.greeterServer.HelloHandler)
+		greeterGroup.GET("/hello", g.greeterClient.HelloHandler)
 	}
 
 	usersGroup := v1.Group("/users")
-	usersGroup.POST("/create", g.usersServer.CreateHandler)
+	usersGroup.POST("/create", g.usersClient.CreateHandler)
 	//usersGroup.Use(authMiddleware.MiddlewareFunc())
 	{
-		usersGroup.GET("/list", g.usersServer.ListHandler)
-		usersGroup.GET("/byid/:id", g.usersServer.ByIDHandler)
-		usersGroup.PUT("/update/:id", g.usersServer.UpdateHandler)
-		usersGroup.DELETE("/delete/:id", g.usersServer.DeleteHandler)
+		usersGroup.GET("/list", g.usersClient.ListHandler)
+		usersGroup.GET("/byid/:id", g.usersClient.ByIDHandler)
+		usersGroup.PUT("/update/:id", g.usersClient.UpdateHandler)
+		usersGroup.DELETE("/delete/:id", g.usersClient.DeleteHandler)
 	}
 
 	products := v1.Group("/products")
@@ -177,11 +177,11 @@ func (g *Gateway) InitV1Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddlewa
 }
 
 // FIXME: implement - use graphql
-func (g *Gateway) InitV2Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) error {
+func (g *APIGateway) InitV2Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) error {
 	return nil
 }
 
-func (g *Gateway) Run(router *gin.Engine, routerPort string) error {
+func (g *APIGateway) Run(router *gin.Engine, routerPort string) error {
 	err := http.ListenAndServe(routerPort, router)
 	if err != nil {
 		return err

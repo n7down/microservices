@@ -2,7 +2,7 @@ package greeter
 
 import (
 	"context"
-	"crypto/tls"
+	//"crypto/tls"
 	"net/http"
 	"time"
 
@@ -11,7 +11,7 @@ import (
 	"github.com/n7down/microservices/internal/client/greeter/response"
 	"github.com/n7down/microservices/internal/pb/greeter"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
+	//"google.golang.org/grpc/credentials"
 )
 
 const (
@@ -19,26 +19,27 @@ const (
 	FIVEMINUTES = 5 * time.Minute
 )
 
-type GreeterServer struct {
+type GreeterClient struct {
 	greeterClient greeter_pb.GreeterServiceClient
 }
 
-func NewGreeterServer(serverEnv string) (*GreeterServer, error) {
-	config := &tls.Config{
-		InsecureSkipVerify: true,
-	}
+func NewGreeterClient(serverEnv string) (*GreeterClient, error) {
+	//config := &tls.Config{
+	//InsecureSkipVerify: true,
+	//}
 
-	greeterConn, err := grpc.Dial(serverEnv, grpc.WithTransportCredentials(credentials.NewTLS(config)))
+	//greeterConn, err := grpc.Dial(serverEnv, grpc.WithTransportCredentials(credentials.NewTLS(config)))
+	greeterConn, err := grpc.Dial(serverEnv, grpc.WithInsecure())
 	if err != nil {
 		return nil, err
 	}
-	server := &GreeterServer{
+	server := &GreeterClient{
 		greeterClient: greeter_pb.NewGreeterServiceClient(greeterConn),
 	}
 	return server, nil
 }
 
-func (s *GreeterServer) HelloHandler(c *gin.Context) {
+func (s *GreeterClient) HelloHandler(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c, FIVEMINUTES)
 	defer cancel()
 

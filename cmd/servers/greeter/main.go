@@ -8,7 +8,7 @@ import (
 	server "github.com/n7down/microservices/internal/servers/greeter"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
+	//"google.golang.org/grpc/credentials"
 )
 
 const (
@@ -25,13 +25,14 @@ func main() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
-	creds, err := credentials.NewServerTLSFromFile(cert, key)
-	if err != nil {
-		log.Fatalf("could not load TLS keys: %s", err)
-	}
+	//creds, err := credentials.NewServerTLSFromFile(cert, key)
+	//if err != nil {
+	//log.Fatalf("could not load TLS keys: %s", err)
+	//}
 
 	log.Infof("Listening on port: %s\n", port)
-	grpcServer := grpc.NewServer(grpc.Creds(creds))
+	//grpcServer := grpc.NewServer(grpc.Creds(creds))
+	grpcServer := grpc.NewServer()
 	greeter_pb.RegisterGreeterServiceServer(grpcServer, &server.GreeterServer{})
 	grpcServer.Serve(lis)
 }
